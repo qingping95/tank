@@ -21,29 +21,25 @@
 #define TANK_MUSIC_HPP
 
 #include <string>
-#include <SFML/Audio/Music.hpp>
+#include <memory>
 
 namespace tank
 {
 
 class Music
 {
-    sf::Music music_;
-    bool loaded_ = false;
+    struct impl;
+    std::unique_ptr<impl> data;
 
 public:
     Music(std::string fileName);
+    ~Music();
 
     bool load(std::string fileName);
 
     void play();
     void pause();
     void stop();
-
-    explicit operator bool()
-    {
-        return loaded_;
-    }
 };
 
 }

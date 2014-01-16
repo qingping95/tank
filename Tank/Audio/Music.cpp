@@ -19,39 +19,47 @@
 
 #include "Music.hpp"
 #include "../System/Game.hpp"
+#include <SFML/Audio/Music.hpp>
 
 namespace tank
 {
 
-Music::Music (std::string fileName)
+struct Music::impl {
+    sf::Music music;
+    bool loaded = false;
+};
+
+Music::Music (std::string fileName) : data(new impl)
 {
     load(fileName);
 }
 
+Music::~Music() = default;
+
 bool Music::load (std::string fileName)
 {
-    if (loaded_)
+    if (data->loaded)
     {
         Game::log << "Music already loaded!" << std::endl;
-        return loaded_;
+        return data->loaded;
     }
-    loaded_ = music_.openFromFile(fileName);
-    return loaded_;
+    data->loaded = data->music.openFromFile(fileName);
+    return data->loaded;
 }
 
 void Music::play()
 {
-    music_.play();
+    data->music.play();
 }
 
 void Music::pause()
 {
-    music_.pause();
+    data->music.pause();
 }
 
 void Music::stop()
 {
-    music_.stop();
+    data->music.stop();
 }
 
 }
