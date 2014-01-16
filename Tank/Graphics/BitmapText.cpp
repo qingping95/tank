@@ -18,6 +18,7 @@
  */
 
 #include "BitmapText.hpp"
+#include "Image.hpp"
 
 #include  <cmath>
 #include  <iostream>
@@ -25,30 +26,83 @@
 namespace tank
 {
 
+struct BitmapText::Impl
+{
+    Image font;
+    Vectoru glyphDims;
+    char asciiOffset;
+    unsigned int rowWidth;
+    Rectu clip;
+
+    std::string text;
+    Vectorf origin;
+};
+
 BitmapText::BitmapText(Image const& font, Vectoru glyphDimensions,
                        char asciiOffset, unsigned int rowWidth)
-    : font_(font)
-    , glyphDims_(glyphDimensions)
-    , asciiOffset_(asciiOffset)
-    , rowWidth_(rowWidth)
-    , clip_({0, 0, glyphDims_.x, glyphDims_.y})
+    : data{new Impl}
 {
-    font_.setClip(clip_);
+    data->font = font;
+    data->glyphDims = glyphDimensions;
+    data->asciiOffset = asciiOffset;
+    data->rowWidth = rowWidth;
+    data->clip = {0,0,data->glyphDims.x, data->glyphDims.y};
+    data->font.setClip(data->clip);
     //font_.setSize(glyphDims_);
+}
+
+void BitmapText::setText(std::string text)
+{
+    data->text = text;
+}
+
+std::string BitmapText::getText()
+{
+    return data->text;
+}
+
+void BitmapText::setScale(float scale)
+{
+    data->font.setScale(scale);
+}
+
+void BitmapText::setScale(Vectorf scale)
+{
+    data->font.setScale(scale);
+}
+
+Vectorf BitmapText::getScale() const
+{
+    return data->font.getScale();
+}
+
+void BitmapText::setOrigin(Vectorf origin)
+{
+    data->origin = origin;
+}
+
+Vectorf BitmapText::getOrigin() const
+{
+    return data->origin;
+}
+
+Vector<unsigned int> BitmapText::getTextureSize() const
+{
+    return data->font.getTextureSize();
 }
 
 void BitmapText::setGlyphSize(Vectorf size)
 {
-    font_.setSize(size);
+    data->font.setSize(size);
 }
 Vectorf BitmapText::getGlyphSize() const
 {
-    return font_.getSize();
+    return data->font.getSize();
 }
 
 Vectorf BitmapText::getSize() const
 {
-    int nChars = text_.size();
+    int nChars = data->text.size();
 
     auto size = getGlyphSize();
     size.x *= nChars;
@@ -66,23 +120,23 @@ void BitmapText::draw(Vectorf parentPos, float parentRot, Camera const& cam)
         rot += parentRot;
     }
 
-    for (unsigned int stringIndex = 0; text_[stringIndex] != '\0'; ++stringIndex)
+    for (unsigned int stringIndex = 0; data->text[stringIndex] != '\0'; ++stringIndex)
     {
-        unsigned int clipIndex = static_cast<unsigned int>(text_[stringIndex]
-                                                           - asciiOffset_);
-        clip_.x = (clipIndex % rowWidth_) * glyphDims_.x;
-        clip_.y = (clipIndex / rowWidth_) * glyphDims_.y;
+        unsigned int clipIndex = static_cast<unsigned int>(data->text[stringIndex]
+                                                           - data->asciiOffset);
+        data->clip.x = (clipIndex % data->rowWidth) * data->glyphDims.x;
+        data->clip.y = (clipIndex / data->rowWidth) * data->glyphDims.y;
 
         const float rads = 3.14159265 * rot / 180.f;
-        const float distance = stringIndex * glyphDims_.x;
+        const float distance = stringIndex * data->glyphDims.x;
         Vectorf displacement;
         displacement.x = distance * std::cos(rads);
         displacement.y = distance * std::sin(rads);
 
-        font_.setClip(clip_);
-        font_.setPos(displacement);
+        data->font.setClip(data->clip);
+        data->font.setPos(displacement);
 
-        font_.draw(pos, rot, cam);
+        data->font.draw(pos, rot, cam);
     }
 }
 

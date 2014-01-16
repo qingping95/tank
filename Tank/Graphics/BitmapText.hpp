@@ -20,51 +20,32 @@
 #ifndef TANK_BITMAPTEXT_HPP
 #define TANK_BITMAPTEXT_HPP
 
-#include <climits>
+#include <limits>
 #include <string>
+#include <memory>
 #include "Graphic.hpp"
-#include "Image.hpp"
 
 namespace tank
 {
 
+class Image;
+
 class BitmapText final : public Graphic
 {
-    Image font_;
-    Vectoru glyphDims_;
-    char asciiOffset_;
-    unsigned int rowWidth_;
-    Rectu clip_;
-
-    // TODO: make std::string
-    std::string text_ {""};
-    Vectorf origin_;
+    struct Impl;
+    std::unique_ptr<Impl> data;
 
 public:
     BitmapText(Image const& font, Vectoru glyphDimensions,
-               char asciiOffset = 32, unsigned int rowWidth = UINT_MAX);
+               char asciiOffset = 32, unsigned rowWidth = std::numeric_limits<unsigned>::max());
 
-    void setText(std::string text)
-    {
-        text_ = text;
-    }
-    std::string getText()
-    {
-        return text_;
-    }
+    void setText(std::string text);
 
-    virtual void setScale(float scale) override
-    {
-        font_.setScale(scale);
-    }
-    virtual void setScale(Vectorf scale) override
-    {
-        font_.setScale(scale);
-    }
-    virtual Vectorf getScale() const override
-    {
-        return font_.getScale();
-    }
+    std::string getText();
+
+    virtual void setScale(float scale) override;
+    virtual void setScale(Vectorf scale) override;
+    virtual Vectorf getScale() const override;
 
     /*!
      * \brief Set the size of each rendered glyph
@@ -84,19 +65,10 @@ public:
      */
     virtual Vectorf getSize() const override;
 
-    virtual void setOrigin(Vectorf origin) override
-    {
-        origin_ = origin;
-    }
-    virtual Vectorf getOrigin() const override
-    {
-        return origin_;
-    }
+    virtual void setOrigin(Vectorf origin) override;
+    virtual Vectorf getOrigin() const override;
 
-    virtual Vector<unsigned int> getTextureSize() const
-    {
-        return font_.getTextureSize();
-    }
+    virtual Vector<unsigned int> getTextureSize() const;
 
     virtual void draw(Vectorf parentPos = {},
                       float parentRot = 0,
