@@ -17,32 +17,58 @@
  * Copyright 2013 (©) Jamie Bayne, David Truby, David Watson.
  */
 
+#include <SFML/Audio/Sound.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
 #include "SoundEffect.hpp"
 #include "../System/Game.hpp"
 
 namespace tank
 {
 
-SoundEffect::SoundEffect(std::string fileName)
+struct SoundEffect::Impl {
+    sf::SoundBuffer buffer;
+    sf::Sound sound;
+    bool loaded = false;
+};
+
+SoundEffect::SoundEffect(std::string fileName) : data{new Impl}
 {
     load(fileName);
 }
 
+SoundEffect::~SoundEffect() = default;
+
+SoundEffect::SoundEffect(const SoundEffect& other) : data{new Impl(*other.data)}
+{
+}
+
+SoundEffect& SoundEffect::operator=(const SoundEffect& other)
+{
+    SoundEffect copy = other;
+    std::swap(*this, copy);
+    return *this;
+}
+
 bool SoundEffect::load(std::string fileName)
 {
-    if (loaded_)
+    if (data->loaded)
     {
         Game::log << "SoundEffect already loaded!" << std::endl;
-        return loaded_;
+        return data->loaded;
     }
-    loaded_ = buffer_.loadFromFile(fileName);
-    sound_.setBuffer(buffer_);
-    return loaded_;
+    data->loaded = data->buffer.loadFromFile(fileName);
+    data->sound.setBuffer(data->buffer);
+    return data->loaded;
 }
 
 void SoundEffect::play()
 {
-    sound_.play();
+    data->sound.play();
+}
+
+SoundEffect::Status SoundEffect::getStatus()
+{
+    return static_cast<SoundEffect::Status>(data->sound.getStatus());
 }
 
 }

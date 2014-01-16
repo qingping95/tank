@@ -21,32 +21,34 @@
 #define TANK_SOUNDEFFECT_HPP
 
 #include <string>
-#include <SFML/Audio/Sound.hpp>
-#include <SFML/Audio/SoundBuffer.hpp>
+#include <memory>
 
 namespace tank
 {
 
 class SoundEffect
 {
-    sf::SoundBuffer buffer_;
-    sf::Sound sound_;
-    bool loaded_ = false;
+    struct Impl;
+    std::unique_ptr<Impl> data;
 
 public:
-    using Status = sf::Sound::Status;
+    enum Status {
+        Stopped, Paused, Playing
+    };
+
     SoundEffect(std::string fileName);
+    ~SoundEffect();
+    SoundEffect(const SoundEffect& other);
+    SoundEffect(SoundEffect&& other) = default;
+
+    SoundEffect& operator=(const SoundEffect& other);
+    SoundEffect& operator=(SoundEffect&& other) = default;
 
     bool load(std::string fileName);
 
     void play();
 
-    explicit operator bool()
-    {
-        return loaded_;
-    }
-
-    Status getStatus() {return sound_.getStatus();}
+    Status getStatus();
 
 };
 
