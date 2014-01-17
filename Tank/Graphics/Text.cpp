@@ -27,7 +27,7 @@ struct Text::Impl {
 };
 
 Text::Text(Font& f, unsigned size, std::string text)
-    : data{new Impl{{text,f,size}}}
+    : data{new Impl{sf::Text{text,f,size}}}
 {
 }
 
