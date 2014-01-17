@@ -23,14 +23,16 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <memory>
 #include "Graphic.hpp"
-#include "Image.hpp"
 #include "../Utility/Vector.hpp"
 #include "../Utility/Rect.hpp"
-#include "../Utility/Timer.hpp"
 
 namespace tank
 {
+
+class Image;
+class Timer;
 
 /*!
  * \brief Represents an image with multiple frames and stores animations for
@@ -45,23 +47,17 @@ class FrameList final : public Graphic
         unsigned int time;
     };
 
-    Image image_;
-    Animation* currentAnimation_ {nullptr};
-    unsigned int currentFrame_ {0};
-    Timer animTimer_;
-    bool loop_ {false};
-    Vectoru frameDimensions_ {0, 0};
-    std::function<void()> callback_ = []{};
-    std::vector<Animation>  animations_;
+    struct Impl;
+    std::unique_ptr<Impl> data;
 
 public:
     FrameList() = default;
     /*!
      * \brief Construct an Animation with a Texture.
-     * \param t Image to give the animation.
+     * \param i Image to give the animation.
      * \param frameDims size of each image in the Texture.
      */
-    FrameList(Image const&, Vector<unsigned int> frameDimensions);
+    FrameList(const Image& i, Vector<unsigned int> frameDimensions);
 
     /*!
      * \brief Add an animation
@@ -121,18 +117,8 @@ public:
     /*!
      * \return If the animation is playing.
      */
-    bool playing()
-    {
-        return currentAnimation_;
-    }
-    std::string currentAnimation()
-    {
-        if (not playing())
-        {
-            return "";
-        }
-        return currentAnimation_->name;
-    }
+    bool playing() const;
+    std::string currentAnimation();
 
     /*!
      * \brief Set the texture of the FrameList.
@@ -141,44 +127,29 @@ public:
      */
     void setImage(Image const&, Vectoru frameDims);
 
-    virtual void setPos(Vectorf pos) { image_.setPos(pos); }
-    virtual Vectorf getPos() const { return image_.getPos(); }
-    virtual bool isRelativeToParent() { return image_.isRelativeToParent(); }
+    virtual void setPos(Vectorf pos);
+    virtual Vectorf getPos() const;
+    virtual bool isRelativeToParent() const;
 
-    virtual void setRotation(float angle) { image_.setRotation(angle); }
-    virtual float getRotation() const { return image_.getRotation(); }
+    virtual void setRotation(float angle);
+    virtual float getRotation() const;
 
-    void setClip(Rectu clip) { image_.setClip(clip); }
-    Rectu getClip() const { return image_.getClip(); }
+    void setClip(Rectu clip);
+    Rectu getClip() const;
 
-    void setOrigin(Vectorf origin) override { image_.setOrigin(origin); }
-    Vectorf getOrigin() const override { return image_.getOrigin(); }
+    void setOrigin(Vectorf origin) override;
+    Vectorf getOrigin() const override;
 
-    void setSize(Vectorf size) { image_.setSize(size); }
-    Vectorf getSize() const override { return image_.getSize(); }
+    void setSize(Vectorf size);
+    Vectorf getSize() const override;
 
 
-    Vectoru getFrameDimensions() const { return frameDimensions_; }
-    virtual void setScale(float scale) override
-    {
-        image_.setScale(scale);
-    }
-    virtual void setScale(Vectorf scale) override
-    {
-        image_.setScale(scale);
-    }
-    virtual Vectorf getScale() const override
-    {
-        return image_.getScale();
-    }
-    virtual void drawRelativeToParent(bool relative)
-    {
-        image_.drawRelativeToParent(relative);
-    }
-    virtual Vectoru getTextureSize() const
-    {
-        return image_.getTextureSize();
-    }
+    Vectoru getFrameDimensions() const;
+    virtual void setScale(float scale) override;
+    virtual void setScale(Vectorf scale) override;
+    virtual Vectorf getScale() const override;
+    virtual void drawRelativeToParent(bool relative);
+    virtual Vectoru getTextureSize() const;
 };
 
 // TODO: Use enum to specify image format

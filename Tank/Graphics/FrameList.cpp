@@ -20,16 +20,124 @@
 #include "FrameList.hpp"
 
 #include <algorithm>
+#include <boost/range/algorithm.hpp>
+
+#include "Image.hpp"
+#include "../Utility/Timer.hpp"
 
 namespace tank
 {
 
-FrameList::FrameList(Image const& i, Vector<unsigned int> frameDims)
-    : image_ (i)
-    , frameDimensions_(frameDims)
+struct FrameList::Impl {
+    Impl(const Image& image, Vector<unsigned> frameDims) :
+        image(image), frameDimensions(frameDims) {}
+    Image image;
+    Vectoru frameDimensions {0, 0};
+    FrameList::Animation* currentAnimation {nullptr};
+    unsigned int currentFrame {0};
+    Timer animTimer;
+    bool loop {false};
+    std::function<void()> callback = []{};
+    std::vector<Animation>  animations;
+};
+
+FrameList::FrameList(const Image& image, Vector<unsigned int> frameDims)
+    : data{new Impl{image, frameDims}}
 {
-    image_.setClip({0,0,frameDims.x, frameDims.y});
+    data->image.setClip({0,0,frameDims.x, frameDims.y});
     //image_.setSize(frameDims);
+}
+
+bool FrameList::playing() const
+{
+    return data->currentAnimation;
+}
+
+std::string FrameList::currentAnimation()
+{
+    if (not playing())
+    {
+        return "";
+    }
+    return data->currentAnimation->name;
+}
+
+void FrameList::setPos(Vectorf pos)
+{
+    data->image.setPos(pos);
+}
+Vectorf FrameList::getPos() const
+{
+    return data->image.getPos();
+}
+bool FrameList::isRelativeToParent() const
+{
+    return data->image.isRelativeToParent();
+}
+
+void FrameList::setRotation(float angle)
+{
+    data->image.setRotation(angle);
+}
+float FrameList::getRotation() const
+{
+    return data->image.getRotation();
+}
+
+void FrameList::setClip(Rectu clip)
+{
+    data->image.setClip(clip);
+}
+
+Rectu FrameList::getClip() const
+{
+    return data->image.getClip();
+}
+
+void FrameList::setOrigin(Vectorf origin)
+{
+    data->image.setOrigin(origin);
+}
+
+Vectorf FrameList::getOrigin() const
+{
+    return data->image.getOrigin();
+}
+
+void FrameList::setSize(Vectorf size)
+{
+    data->image.setSize(size);
+}
+Vectorf FrameList::getSize() const
+{
+    return data->image.getSize();
+}
+
+
+Vectoru FrameList::getFrameDimensions() const
+{
+    return data->frameDimensions;
+}
+
+void FrameList::setScale(float scale)
+{
+    data->image.setScale(scale);
+}
+void FrameList::setScale(Vectorf scale)
+{
+    data->image.setScale(scale);
+}
+Vectorf FrameList::getScale() const
+{
+    return data->image.getScale();
+}
+void FrameList::drawRelativeToParent(bool relative)
+{
+    data->image.drawRelativeToParent(relative);
+}
+Vectoru FrameList::getTextureSize() const
+{
+    return data->image.getTextureSize();
 }
 
 void FrameList::add(std::string name,
@@ -38,22 +146,21 @@ void FrameList::add(std::string name,
 {
     // TODO: validate arguments
     // Create new Animation
-    animations_.push_back({name, frames, time});
+    data->animations.push_back({name, frames, time});
 }
 
 void FrameList::remove(std::string name)
 {
     // Find the animation by name
-    auto iter = std::find_if_not(animations_.begin(), animations_.end(),
-                                 [&name](Animation& anim)
+    auto iter = boost::find_if(data->animations, [&name](Animation& anim)
     {
-        return anim.name == (name);
+        return anim.name != (name);
     });
 
     //Remove the animation from the animations list
-    if (iter != animations_.end())
+    if (iter != data->animations.end())
     {
-        animations_.erase(iter);
+        data->animations.erase(iter);
     }
 }
 
@@ -61,17 +168,17 @@ void FrameList::select(std::string name, bool loop,
                        std::function<void()> callback)
 {
     //Check that the requested animation is not already playing
-    if (not currentAnimation_ || currentAnimation_->name != name)
+    if (not data->currentAnimation || data->currentAnimation->name != name)
     {
         //search for the name requested
-        for (auto& anim : animations_)
+        for (auto& anim : data->animations)
         {
             if (anim.name == name)
             {
-                currentAnimation_ = &anim;
-                currentFrame_ = 0;
-                loop_ = loop;
-                callback_ = callback;
+                data->currentAnimation = &anim;
+                data->currentFrame = 0;
+                data->loop = loop;
+                data->callback = callback;
             }
         }
     }
@@ -80,29 +187,29 @@ void FrameList::select(std::string name, bool loop,
 void FrameList::refresh()
 {
     //Only play if there is a selected animation
-    if (currentAnimation_)
+    if (data->currentAnimation)
     {
         //Check if we need to change animation frame
-        bool playNextFrame = animTimer_.getTicks() > currentAnimation_->time;
+        bool playNextFrame = data->animTimer.getTicks() > data->currentAnimation->time;
 
 
         if (playNextFrame)
         {
-            ++currentFrame_;
+            ++data->currentFrame;
 
-            animTimer_.start(); //Reset timer
+            data->animTimer.start(); //Reset timer
 
             //Check if we've finished the animation
-            unsigned const int lastFrame = currentAnimation_->frameList.size();
+            unsigned const int lastFrame = data->currentAnimation->frameList.size();
 
-            if (currentFrame_ >= lastFrame)
+            if (data->currentFrame >= lastFrame)
             {
-                currentFrame_ = 0;
+                data->currentFrame = 0;
 
-                callback_();
+                data->callback();
 
                 //If the animation doesn't loop, stop it
-                if (not loop_)
+                if (not data->loop)
                 {
                     //Reset all properties (callback, timer, currentFrame, etc)
                     stop();
@@ -112,59 +219,59 @@ void FrameList::refresh()
     }
 
     //Animation may have ended now. If not, need to set clipping mask for image
-    if (currentAnimation_)
+    if (data->currentAnimation)
     {
         //Start at first frame
-        unsigned int frame = currentAnimation_->frameList[currentFrame_];
+        unsigned int frame = data->currentAnimation->frameList[data->currentFrame];
 
         //Set clipping rectangle according to current frame
-        image_.setClip(frameDimensions_, frame);
+        data->image.setClip(data->frameDimensions, frame);
     }
 }
 
 void FrameList::start()
 {
-    if (not animTimer_.isStarted())
+    if (not data->animTimer.isStarted())
     {
-        animTimer_.start();
+        data->animTimer.start();
     }
 }
 
 void FrameList::pause()
 {
-    animTimer_.pause();
+    data->animTimer.pause();
 }
 
 void FrameList::resume()
 {
-    if (animTimer_.isPaused() and currentAnimation_ != nullptr)
+    if (data->animTimer.isPaused() and data->currentAnimation != nullptr)
     {
-        animTimer_.resume();
+        data->animTimer.resume();
     }
 }
 
 void FrameList::stop()
 {
     //Change appearance to first frame
-    currentFrame_ = 0;
+    data->currentFrame = 0;
     refresh();
 
     //Unset member variables
-    animTimer_.stop();
-    callback_ = []{};
-    currentAnimation_ = nullptr;
+    data->animTimer.stop();
+    data->callback = []{};
+    data->currentAnimation = nullptr;
 }
 
 void FrameList::draw(Vectorf parentPos, float parentRot, Camera const& cam)
 {
     refresh();
-    image_.draw(parentPos, parentRot, cam);
+    data->image.draw(parentPos, parentRot, cam);
 }
 
 void FrameList::setImage(Image const& image, Vector<unsigned int> frameDims)
 {
-    frameDimensions_ = frameDims;
-    image_ = image;
+    data->frameDimensions = frameDims;
+    data->image = image;
 }
 
 void addWalkingFrameList(FrameList& anim, unsigned int time)
