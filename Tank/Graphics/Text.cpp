@@ -21,9 +21,63 @@
 
 namespace tank
 {
+
+struct Text::Impl {
+        sf::Text text;
+};
+
+Text::Text(Font& f, unsigned size, std::string text)
+    : data{new Impl{{text,f,size}}}
+{
+}
+
+Text::~Text() = default;
+
+void Text::setFont(Font& f)
+{
+    data->text.setFont(f);
+}
+
+void Text::setFontSize(unsigned s)
+{
+    data->text.setCharacterSize(s);
+}
+unsigned Text::getFontSize() const
+{
+    return data->text.getCharacterSize();
+}
+
+void Text::setText(std::string s)
+{
+    data->text.setString(s);
+}
+
+std::string Text::getText() const
+{
+    return data->text.getString();
+}
+
+void Text::setOrigin(Vectorf o)
+{
+    data->text.setOrigin(o.x,o.y);
+}
+Vectorf Text::getOrigin() const
+{
+    return {data->text.getOrigin().x, data->text.getOrigin().y};
+}
+
+Vectorf Text::getSize() const
+{
+    return {data->text.getLocalBounds().width, data->text.getLocalBounds().height};
+}
+
+void Text::setColor(const Color& color) {
+    data->text.setColor(color);
+}
+
 void Text::draw(Vectorf parentPos, float parentRot, Camera const& cam)
 {
-    Graphic::transform(this, parentPos, parentRot, cam, text_);
-    Game::window()->SFMLWindow().draw(text_);
+    Graphic::transform(this, parentPos, parentRot, cam, data->text);
+    Game::window()->SFMLWindow().draw(data->text);
 }
 }
