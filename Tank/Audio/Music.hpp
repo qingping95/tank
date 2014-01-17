@@ -21,7 +21,7 @@
 #define TANK_MUSIC_HPP
 
 #include <string>
-#include <memory>
+#include "../Utility/Pimpl.hpp"
 
 namespace tank
 {
@@ -29,11 +29,11 @@ namespace tank
 class Music
 {
     struct impl;
-    std::unique_ptr<impl> data;
+    Pimpl<impl> data;
 
 public:
     Music(std::string fileName);
-    ~Music();
+    //~Music();
 
     bool load(std::string fileName);
 
