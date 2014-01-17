@@ -39,6 +39,8 @@ public:
     BitmapText(Image const& font, Vectoru glyphDimensions,
                char asciiOffset = 32, unsigned rowWidth = std::numeric_limits<unsigned>::max());
 
+    ~BitmapText();
+
     void setText(std::string text);
 
     std::string getText();

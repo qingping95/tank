@@ -46,6 +46,8 @@ BitmapText::BitmapText(Image const& font, Vectoru glyphDimensions,
     data->font.setClip(data->clip);
 }
 
+BitmapText::~BitmapText() = default;
+
 void BitmapText::setText(std::string text)
 {
     data->text = text;
