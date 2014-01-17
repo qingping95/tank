@@ -51,13 +51,15 @@ class FrameList final : public Graphic
     std::unique_ptr<Impl> data;
 
 public:
-    FrameList() = default;
+    FrameList();
     /*!
      * \brief Construct an Animation with a Texture.
      * \param i Image to give the animation.
      * \param frameDims size of each image in the Texture.
      */
     FrameList(const Image& i, Vector<unsigned int> frameDimensions);
+
+    ~FrameList();
 
     /*!
      * \brief Add an animation

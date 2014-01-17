@@ -29,6 +29,7 @@ namespace tank
 {
 
 struct FrameList::Impl {
+    Impl() = default;
     Impl(const Image& image, Vector<unsigned> frameDims) :
         image(image), frameDimensions(frameDims) {}
     Image image;
@@ -41,12 +42,16 @@ struct FrameList::Impl {
     std::vector<Animation>  animations;
 };
 
+FrameList::FrameList() : data{new Impl} {}
+
 FrameList::FrameList(const Image& image, Vector<unsigned int> frameDims)
     : data{new Impl{image, frameDims}}
 {
     data->image.setClip({0,0,frameDims.x, frameDims.y});
     //image_.setSize(frameDims);
 }
+
+FrameList::~FrameList() = default;
 
 bool FrameList::playing() const
 {
