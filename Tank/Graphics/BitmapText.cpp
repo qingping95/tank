@@ -40,15 +40,10 @@ struct BitmapText::Impl
 
 BitmapText::BitmapText(Image const& font, Vectoru glyphDimensions,
                        char asciiOffset, unsigned int rowWidth)
-    : data{new Impl}
+    : data{new Impl{font, glyphDimensions, asciiOffset, rowWidth,
+                    {0,0,data->glyphDims.x, data->glyphDims.y}}} // clip
 {
-    data->font = font;
-    data->glyphDims = glyphDimensions;
-    data->asciiOffset = asciiOffset;
-    data->rowWidth = rowWidth;
-    data->clip = {0,0,data->glyphDims.x, data->glyphDims.y};
     data->font.setClip(data->clip);
-    //font_.setSize(glyphDims_);
 }
 
 void BitmapText::setText(std::string text)
