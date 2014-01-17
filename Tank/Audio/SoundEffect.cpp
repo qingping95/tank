@@ -44,7 +44,8 @@ SoundEffect::SoundEffect(const SoundEffect& other) : data{new Impl(*other.data)}
 
 SoundEffect& SoundEffect::operator=(const SoundEffect& other)
 {
-    SoundEffect copy = other;
+    // Copy and swap
+    SoundEffect copy {other};
     std::swap(*this, copy);
     return *this;
 }
