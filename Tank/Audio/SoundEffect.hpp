@@ -21,7 +21,7 @@
 #define TANK_SOUNDEFFECT_HPP
 
 #include <string>
-#include <memory>
+#include "../Utility/Pimpl.hpp"
 
 namespace tank
 {
@@ -29,7 +29,7 @@ namespace tank
 class SoundEffect
 {
     struct Impl;
-    std::unique_ptr<Impl> data;
+    Pimpl<Impl> data;
 
 public:
     enum Status {
@@ -37,12 +37,6 @@ public:
     };
 
     SoundEffect(std::string fileName);
-    ~SoundEffect();
-    SoundEffect(const SoundEffect& other);
-    SoundEffect(SoundEffect&& other) = default;
-
-    SoundEffect& operator=(const SoundEffect& other);
-    SoundEffect& operator=(SoundEffect&& other) = default;
 
     bool load(std::string fileName);
 

@@ -20,21 +20,22 @@
 #include "Music.hpp"
 #include "../System/Game.hpp"
 #include <SFML/Audio/Music.hpp>
+#include "../Utility/Pimpl_impl.hpp"
 
 namespace tank
 {
 
-struct Music::impl {
+struct Music::Impl {
     sf::Music music;
     bool loaded = false;
 };
 
-Music::Music (std::string fileName) : data(new impl)
+template class Pimpl<Music::Impl>;
+
+Music::Music (std::string fileName)
 {
     load(fileName);
 }
-
-Music::~Music() = default;
 
 bool Music::load (std::string fileName)
 {

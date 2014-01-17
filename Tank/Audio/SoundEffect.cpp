@@ -21,6 +21,7 @@
 #include <SFML/Audio/SoundBuffer.hpp>
 #include "SoundEffect.hpp"
 #include "../System/Game.hpp"
+#include "../Utility/Pimpl_impl.hpp"
 
 namespace tank
 {
@@ -31,23 +32,11 @@ struct SoundEffect::Impl {
     bool loaded = false;
 };
 
-SoundEffect::SoundEffect(std::string fileName) : data{new Impl}
+template class Pimpl<SoundEffect::Impl>;
+
+SoundEffect::SoundEffect(std::string fileName)
 {
     load(fileName);
-}
-
-SoundEffect::~SoundEffect() = default;
-
-SoundEffect::SoundEffect(const SoundEffect& other) : data{new Impl(*other.data)}
-{
-}
-
-SoundEffect& SoundEffect::operator=(const SoundEffect& other)
-{
-    // Copy and swap
-    SoundEffect copy {other};
-    std::swap(*this, copy);
-    return *this;
 }
 
 bool SoundEffect::load(std::string fileName)
