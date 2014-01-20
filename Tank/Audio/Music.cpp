@@ -37,6 +37,8 @@ Music::Music (std::string fileName)
     load(fileName);
 }
 
+Music::~Music() = default;
+
 bool Music::load (std::string fileName)
 {
     if (data->loaded)
