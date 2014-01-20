@@ -20,7 +20,6 @@
 #ifndef TANK_OBSERVING_PTR
 #define TANK_OBSERVING_PTR
 #include <memory>
-#include <functional>
 
 namespace tank
 {
