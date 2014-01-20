@@ -20,9 +20,8 @@
 #ifndef TANK_TEXT_HPP
 #define TANK_TEXT_HPP
 
-#include <SFML/Graphics/Text.hpp>
-#include "../System/Entity.hpp"
-#include "../Utility/Timer.hpp"
+#include "../Utility/Pimpl.hpp"
+#include "../Graphics/Graphic.hpp"
 #include "../Utility/Vector.hpp"
 #include "Font.hpp"
 #include "Color.hpp"
@@ -32,16 +31,16 @@
 namespace tank
 {
 
+class Camera;
+
 class Text : public Graphic
 {
     struct Impl;
-    std::unique_ptr<Impl> data;
+    Pimpl<Impl> data;
 public:
     Text() = default;
     Text(const Text&) = default;
     Text(Font& f, unsigned size = 30, std::string text = "");
-
-    ~Text();
 
     void setFont(Font& f);
 

@@ -18,6 +18,9 @@
  */
 
 #include "Text.hpp"
+#include <SFML/Graphics/Text.hpp>
+#include "../Utility/Pimpl_impl.hpp"
+#include "../System/Game.hpp"
 
 namespace tank
 {
@@ -26,12 +29,12 @@ struct Text::Impl {
         sf::Text text;
 };
 
+template class Pimpl<Text::Impl>;
+
 Text::Text(Font& f, unsigned size, std::string text)
-    : data{new Impl{sf::Text{text,f,size}}}
+    : data{sf::Text{text,f,size}}
 {
 }
-
-Text::~Text() = default;
 
 void Text::setFont(Font& f)
 {
