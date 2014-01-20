@@ -36,6 +36,18 @@ T& Pimpl<T>::operator*()
     return *ptr.get();
 }
 
+template<typename T>
+const T* Pimpl<T>::operator->() const
+{
+    return ptr.get();
+}
+
+template<typename T>
+const T& Pimpl<T>::operator*() const
+{
+    return *ptr.get();
+}
+
 }
 
 #endif

@@ -22,6 +22,8 @@ public:
 
     T* operator->();
     T& operator*();
+    const T* operator->() const;
+    const T& operator*() const;
 };
 
 }
