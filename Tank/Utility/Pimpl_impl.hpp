@@ -16,7 +16,7 @@ Pimpl<T>::Pimpl() : ptr{new T{}}
 
 template<typename T>
 template<typename ...Args>
-Pimpl<T>::Pimpl( Args&& ...args )
+Pimpl<T>::Pimpl(Args&& ...args)
     : ptr{new T{std::forward<Args>(args)...}}
 {
 }

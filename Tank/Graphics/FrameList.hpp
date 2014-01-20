@@ -27,6 +27,7 @@
 #include "Graphic.hpp"
 #include "../Utility/Vector.hpp"
 #include "../Utility/Rect.hpp"
+#include "../Utility/Pimpl.hpp"
 
 namespace tank
 {
@@ -48,18 +49,16 @@ class FrameList final : public Graphic
     };
 
     struct Impl;
-    std::unique_ptr<Impl> data;
+    Pimpl<Impl> data;
 
 public:
-    FrameList();
+    FrameList() = default;
     /*!
      * \brief Construct an Animation with a Texture.
      * \param i Image to give the animation.
      * \param frameDims size of each image in the Texture.
      */
     FrameList(const Image& i, Vector<unsigned int> frameDimensions);
-
-    ~FrameList();
 
     /*!
      * \brief Add an animation

@@ -24,6 +24,7 @@
 
 #include "Image.hpp"
 #include "../Utility/Timer.hpp"
+#include "../Utility/Pimpl_impl.hpp"
 
 namespace tank
 {
@@ -42,16 +43,14 @@ struct FrameList::Impl {
     std::vector<Animation>  animations;
 };
 
-FrameList::FrameList() : data{new Impl} {}
+template class Pimpl<FrameList::Impl>;
 
 FrameList::FrameList(const Image& image, Vector<unsigned int> frameDims)
-    : data{new Impl{image, frameDims}}
+    : data{image, frameDims}
 {
     data->image.setClip({0,0,frameDims.x, frameDims.y});
     //image_.setSize(frameDims);
 }
-
-FrameList::~FrameList() = default;
 
 bool FrameList::playing() const
 {
