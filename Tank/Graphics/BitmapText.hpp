@@ -24,6 +24,7 @@
 #include <string>
 #include <memory>
 #include "Graphic.hpp"
+#include "../Utility/Pimpl.hpp"
 
 namespace tank
 {
@@ -33,13 +34,11 @@ class Image;
 class BitmapText final : public Graphic
 {
     struct Impl;
-    std::unique_ptr<Impl> data;
+    Pimpl<Impl> data;
 
 public:
     BitmapText(Image const& font, Vectoru glyphDimensions,
                char asciiOffset = 32, unsigned rowWidth = std::numeric_limits<unsigned>::max());
-
-    ~BitmapText();
 
     void setText(std::string text);
 

@@ -22,6 +22,7 @@
 
 #include  <cmath>
 #include  <iostream>
+#include "../Utility/Pimpl_impl.hpp"
 
 namespace tank
 {
@@ -38,15 +39,16 @@ struct BitmapText::Impl
     Vectorf origin;
 };
 
+
+template class Pimpl<BitmapText::Impl>;
+
 BitmapText::BitmapText(Image const& font, Vectoru glyphDimensions,
                        char asciiOffset, unsigned int rowWidth)
-    : data{new Impl{font, glyphDimensions, asciiOffset, rowWidth,
-                    Rectu{0,0,data->glyphDims.x, data->glyphDims.y}}} // clip
+    : data{font, glyphDimensions, asciiOffset, rowWidth,
+                    Rectu{0,0,data->glyphDims.x, data->glyphDims.y}} // clip
 {
     data->font.setClip(data->clip);
 }
-
-BitmapText::~BitmapText() = default;
 
 void BitmapText::setText(std::string text)
 {
