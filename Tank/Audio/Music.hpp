@@ -33,7 +33,6 @@ class Music
 
 public:
     Music(std::string fileName);
-    ~Music();
 
     bool load(std::string fileName);
 

@@ -2,19 +2,21 @@
 #define TANK_CIRCLESHAPE_HPP
 
 #include <SFML/Graphics/CircleShape.hpp>
+#include "../Utility/Pimpl.hpp"
 #include "Shape.hpp"
 
 namespace tank {
 
 class CircleShape : public Shape
 {
-    sf::CircleShape circleShape_;
+    struct Impl;
+    Pimpl<Impl> data;
 
 public:
     CircleShape(float radius = 0);
 
-    void setRadius(float radius) { circleShape_.setRadius(radius); }
-    float getRadius() const { return circleShape_.getRadius(); }
+    void setRadius(float radius);
+    float getRadius() const;
 
     virtual void setFillColor(Color colour) override;
     virtual void setOutlineColor(Color colour) override;
@@ -25,16 +27,9 @@ public:
 
     virtual Vectorf getSize() const override;
 
-    virtual void setOrigin(Vectorf o) override
-    {
-        circleShape_.setOrigin({o.x, o.y});
-    }
+    virtual void setOrigin(Vectorf o) override;
 
-    virtual Vectorf getOrigin() const override
-    {
-        auto origin = circleShape_.getOrigin();
-        return { origin.x, origin.y };
-    }
+    virtual Vectorf getOrigin() const override;
 
     virtual void draw(Vectorf parentPos = {},
                       float parentRot = 0,

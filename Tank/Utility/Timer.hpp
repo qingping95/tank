@@ -40,7 +40,7 @@ class Timer
     bool started_ {false};
     bool paused_ {false};
 
-public: 
+public:
     Timer() = default;
     Timer(const Timer& orig) = default;
     ~Timer() = default;

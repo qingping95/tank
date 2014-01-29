@@ -1,40 +1,47 @@
 #include "CircleShape.hpp"
 #include "../System/Game.hpp"
+#include "../Utility/Pimpl_impl.hpp"
 
 namespace tank {
 
-CircleShape::CircleShape(float radius):Shape(), circleShape_(radius)
+struct CircleShape::Impl {
+    sf::CircleShape circleShape;
+};
+
+template class Pimpl<CircleShape::Impl>;
+
+CircleShape::CircleShape(float radius):Shape(), data{sf::CircleShape{radius}}
 {
 }
 
 void CircleShape::setFillColor(Color c)
 {
-    circleShape_.setFillColor(c);
+    data->circleShape.setFillColor(c);
 }
 void CircleShape::setOutlineColor(Color c)
 {
-    circleShape_.setOutlineColor(c);
+    data->circleShape.setOutlineColor(c);
 }
 void CircleShape::setOutlineThickness(float thickness)
 {
-    circleShape_.setOutlineThickness(thickness);
+    data->circleShape.setOutlineThickness(thickness);
 }
 Color const& CircleShape::getFillColor() const
 {
-    return circleShape_.getFillColor();
+    return data->circleShape.getFillColor();
 }
 Color const& CircleShape::getOutlineColor() const
 {
-    return circleShape_.getOutlineColor();
+    return data->circleShape.getOutlineColor();
 }
 float CircleShape::getOutlineThickness() const
 {
-    return circleShape_.getOutlineThickness();
+    return data->circleShape.getOutlineThickness();
 }
 
 Vectorf CircleShape::getSize() const
 {
-    auto rect = circleShape_.getGlobalBounds();
+    auto rect = data->circleShape.getGlobalBounds();
     return {rect.width, rect.height};
 }
 
@@ -42,8 +49,22 @@ void CircleShape::draw(tank::Vectorf parentPos,
                        float parentRot,
                        tank::Camera const& cam)
 {
-    Graphic::transform(this, parentPos, parentRot, cam, circleShape_);
-    Game::window()->SFMLWindow().draw(circleShape_);
+    Graphic::transform(this, parentPos, parentRot, cam, data->circleShape);
+    Game::window()->SFMLWindow().draw(data->circleShape);
+}
+
+void CircleShape::setRadius(float radius) { data->circleShape.setRadius(radius); }
+float CircleShape::getRadius() const { return data->circleShape.getRadius(); }
+
+void CircleShape::setOrigin(Vectorf o)
+{
+    data->circleShape.setOrigin({o.x, o.y});
+}
+
+Vectorf CircleShape::getOrigin() const
+{
+    auto origin = data->circleShape.getOrigin();
+    return { origin.x, origin.y };
 }
 
 
