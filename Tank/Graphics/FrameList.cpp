@@ -146,7 +146,7 @@ Vectoru FrameList::getTextureSize() const
 
 void FrameList::add(std::string name,
                     std::vector<unsigned int> const& frames,
-                    unsigned int time)
+                    std::chrono::milliseconds time)
 {
     // TODO: validate arguments
     // Create new Animation
@@ -278,7 +278,7 @@ void FrameList::setImage(Image const& image, Vector<unsigned int> frameDims)
     data->image = image;
 }
 
-void addWalkingFrameList(FrameList& anim, unsigned int time)
+void addWalkingFrameList(FrameList& anim, std::chrono::milliseconds time)
 {
     unsigned int xFrames = anim.getTextureSize().x / anim.getFrameDimensions().x;
 

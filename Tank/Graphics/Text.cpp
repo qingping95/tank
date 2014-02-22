@@ -22,6 +22,8 @@
 #include "../Utility/Pimpl_impl.hpp"
 #include "../System/Game.hpp"
 
+#include "../System/Game.hpp"
+
 namespace tank
 {
 

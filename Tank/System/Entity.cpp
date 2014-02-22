@@ -22,6 +22,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <algorithm>
+#include "Game.hpp"
 #include "World.hpp"
 
 namespace tank {
@@ -35,7 +36,6 @@ Entity::Entity(Vectorf pos)
 
 Entity::~Entity() {}
 
-//Default draw function
 void Entity::draw(Camera const& cam)
 {
     for(auto& g : graphics_)
@@ -78,12 +78,12 @@ std::vector<observing_ptr<Entity>> Entity::collide(std::vector<std::string> colT
 
             const double leftA   = A.x + pos_.x;
             const double leftB   = B.x + ent->getPos().x;
-            const double rightA  = A.x + A.w + pos_.x;
-            const double rightB  = B.x + B.w + ent->getPos().x;
+            const double rightA  = leftA + A.w;
+            const double rightB  = leftB + B.w;
             const double topA    = A.y + pos_.y;
             const double topB    = B.y + ent->getPos().y;
-            const double bottomA = A.y + A.h + pos_.y;
-            const double bottomB = B.y + B.h + ent->getPos().y;
+            const double bottomA = topA + A.h;
+            const double bottomB = topB + B.h;
 
             if (leftA > rightB or topA > bottomB or
                 rightA < leftB or bottomA < topB)
